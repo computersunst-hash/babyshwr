@@ -392,8 +392,6 @@ body {
 #music-fab:active { transform: scale(0.92); }
 @keyframes fab-appear { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
 
-/* ── AUDIO (hidden) ── */
-#bg-audio { display: none; }
 
 /* ── FOOTER ── */
 .footer { text-align: center; padding: 8px 24px 28px; }
@@ -419,10 +417,14 @@ body {
 </head>
 <body>
 
-<!-- AUDIO (plays after user gesture) -->
-<audio id="bg-audio" loop preload="none">
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-</audio>
+<!-- HIDDEN YOUTUBE PLAYER – Kuni Tari Yenar Yenar G (Ashi Hi Banwa Banwi) -->
+<iframe id="yt-player"
+  src=""
+  allow="autoplay; encrypted-media"
+  frameborder="0"
+  style="position:fixed;width:1px;height:1px;top:-9999px;left:-9999px;opacity:0;pointer-events:none;"
+  aria-hidden="true" tabindex="-1">
+</iframe>
 
 <!-- CONFETTI -->
 <canvas id="confetti-canvas"></canvas>
@@ -739,30 +741,32 @@ function showConfetti() {
   requestAnimationFrame(draw);
 }
 
-/* ── MUSIC ── */
-const audio = document.getElementById('bg-audio');
+/* ── MUSIC – Kuni Tari Yenar Yenar G (Ashi Hi Banwa Banwi) ── */
+// Video ID: B3_ysGFHLQE
+const YT_ID = 'B3_ysGFHLQE';
 let musicMuted = false;
 
+function ytSrc(mute) {
+  return `https://www.youtube.com/embed/${YT_ID}?autoplay=1&loop=1&playlist=${YT_ID}&controls=0&mute=${mute ? 1 : 0}&enablejsapi=1&rel=0`;
+}
+
 function startMusic() {
-  audio.volume = 0.20;
-  audio.play().catch(() => {});
+  document.getElementById('yt-player').src = ytSrc(false);
+  musicMuted = false;
+  updateFab();
 }
 
 function toggleMusic() {
+  musicMuted = !musicMuted;
+  document.getElementById('yt-player').src = ytSrc(musicMuted);
+  updateFab();
+}
+
+function updateFab() {
   const fab = document.getElementById('music-fab');
-  if (musicMuted) {
-    audio.muted = false;
-    musicMuted = false;
-    fab.textContent = '🎵';
-    fab.setAttribute('aria-label', 'Mute background music');
-    fab.title = 'Mute music';
-  } else {
-    audio.muted = true;
-    musicMuted = true;
-    fab.textContent = '🔇';
-    fab.setAttribute('aria-label', 'Unmute background music');
-    fab.title = 'Unmute music';
-  }
+  fab.textContent = musicMuted ? '🔇' : '🎵';
+  fab.setAttribute('aria-label', musicMuted ? 'Unmute background music' : 'Mute background music');
+  fab.title = musicMuted ? 'Unmute music' : 'Mute music';
 }
 
 /* ── COUNTDOWN ── */
